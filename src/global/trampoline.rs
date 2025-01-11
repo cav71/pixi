@@ -34,6 +34,12 @@ use tokio::io::AsyncReadExt;
 
 use super::ExposedName;
 
+#[cfg(target_arch = "arm")]
+#[cfg(target_os = "linux")]
+#[cfg(target_abi = "eabihf")]
+const TRAMPOLINE_BIN: &[u8] =
+    include_bytes!("../../trampoline/binaries/pixi-trampoline-armv7-unknown-linux-gnueabihf.zst");
+
 #[cfg(target_arch = "aarch64")]
 #[cfg(target_os = "macos")]
 const TRAMPOLINE_BIN: &[u8] =

@@ -11,10 +11,10 @@ def get_default_target() -> str:
     raise RuntimeError("Unable to determine default target")
 
 
-def build_trampoline_binary(target: str, target_dir: Path) -> None:
+def build_trampoline_binary(target: str, target_dir: Path, cargo: str) -> None:
     subprocess.run(
         [
-            "cargo",
+            cargo,
             "build",
             "--release",
             "--target",
@@ -40,14 +40,20 @@ def compress_binary(target: str, target_dir: Path) -> None:
     subprocess.run(["zstd", binary_path, "-o", compressed_path, "--force"], check=True)
 
 
-def main(target: str) -> None:
+def main(target: str, cargo: str) -> None:
     target_dir = Path("target/trampoline")
-    build_trampoline_binary(target, target_dir)
+    build_trampoline_binary(target, target_dir, cargo)
     compress_binary(target, target_dir)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build and compress trampoline binaries.")
+    parser.add_argument(
+        "--cargo",
+        choices=["cargo", "cross",],
+        default="cargo",
+        help="switch the cargo binary for cross"
+    )
     parser.add_argument(
         "--target",
         type=str,
@@ -55,4 +61,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     target = args.target if args.target else get_default_target()
-    main(target)
+    main(target, args.cargo)
